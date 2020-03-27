@@ -8,17 +8,31 @@ const hostname = '127.0.0.1';
 const port = 3000 ;
 let amount = 0;
 
+// call back function for event emitter
 const jackpot = () =>{
     console.log('jackpot!!!');
     amount = 0;
 };
+
+//function to get a querystring out of the whole query
+const getAmount = (key,string)=>{
+    let stringList= string.split('&');
+    for (item of stringList){
+        tmpList = item.split('=');
+        if(tmpList[0]===key){
+            return tmpList[1];
+        }else{
+            return 0;
+        }
+    }
+}
 
 eventEmitter.on('Jackpot',jackpot);
 
 const server = http.createServer((req, res)=>{
     let {pathname,query} = url.parse(req.url);
     if(query){
-        let amountOnCall = query.split('=')[1];
+        let amountOnCall = getAmount('amount',query);
         if(isNaN(parseInt(amountOnCall))){
             if(amountOnCall==='max'){
                 amount=amountOnCall;
