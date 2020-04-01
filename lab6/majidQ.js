@@ -1,17 +1,6 @@
 //Exercise1:
 //Part 1. Use the seed data script
 // DONE!
-dbo.collection.insert({
-"address" : {
-        "building" : "1122334455",
-        "street" : "Mongo Street",
-        "zipcode" : "1234567890"
-    },
-    "city" : "Tornoto",
-    "cuisine" : "Persian food",
-    "name" : "Majid Persian food",
-    "restaurant_id" : "101284289"
-})
 
 // Part 2 :getting all data in collection
 db.getCollection("Restaurants").find({})
