@@ -12,11 +12,11 @@ const Order = require('./models/Order');
 //Complete later
 let localConnectionString = 'mongodb://localhost:27017/admin?readPreference=primary&appname=MongoDB%20Compass%20Community&ssl=false';
 let atlasConnectionString = 'mongodb+srv://MajidMongoUser:Mongo2146@cluster0-o3pt4.azure.mongodb.net/test?retryWrites=true&w=majority';
-mongoose.connect(localConnectionString);
+mongoose.connect(atlasConnectionString);
 
 //connection to mongoose
 mongoose
- .connect(localConnectionString, { useNewUrlParser: true } )
+ .connect(atlasConnectionString, { useNewUrlParser: true } )
  .then( () => { console.log("Mongoose connected successfully "); },
    error => { console.log("Mongoose could not connected to database: " + error); }
  );
