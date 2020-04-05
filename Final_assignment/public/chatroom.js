@@ -17,12 +17,13 @@ $(function(){
     let socket = io.connect('http://localhost:3000');
     socket.emit('changeUsername', {username :nickname,avatar:avatar});
 
-    let message = $("#message")
-    let username = $("#username")
-    let send_message = $("#send_message")
-    let send_username = $("#send_username")
-    let chatroom = $("#chatroom")
-    let feedback = $("#feedback")
+    let message = $("#message");
+    let username = $("#username");
+    let send_message = $("#send_message");
+    let send_username = $("#send_username");
+    let chatroom = $("#chatroom");
+    let feedback = $("#feedback");
+    let usersPanel = $("#usersPanel");
 
     //Emit message
     send_message.click( () => {
@@ -33,24 +34,30 @@ $(function(){
     socket.on("newMessage", (data) => {
         feedback.html('');
         message.val('');
-        chatroom.append(`<img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/>`);
-        chatroom.append(`<p class="message"><b>${data.username}</b>:  ${data.message} </p>`);
-    })
+        // chatroom.append(`<img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/>`);
+        chatroom.append(`<p class="message"><img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/><b>${data.username}</b>:  ${data.message} </p>`);
+    });
 
     //Emit a username
     send_username.click(function(){
         socket.emit('changeUsername', {username : username.val()})
-    })
+    });
 
     //Emit typing
     message.bind("keypress", () => {
         socket.emit('userTyping');
-    })
+    });
 
     //Listen on typing
     socket.on('userTyping', (data) => {
         feedback.html(`<p><i>${data.username} is typing a message...</i></p>`);
-    })
+    });
+
+    //Listen on new user joining
+    socket.on('newUser', (data) => {
+        usersPanel.append(`<p class=""><img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/><b>${data.username}</b>`);
+        console.log(`${data.username}:${data.avatar}`);
+    });
 });
 
 
