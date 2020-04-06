@@ -2,13 +2,9 @@ const express = require('express');
 const app = express();
 const dbDao = require('./dao');
 
-let msgs = [];
-let publicRoom = [];
-
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-
 
 app.get('/', (req, res) => {
 	res.render('index')
@@ -40,7 +36,8 @@ io.on('connection', (socket) => {
     socket.on('changeUsername', (data) => {
         let userAvatar = data.avatar;
         socket.username = data.username;
-
+        socket.joinedRoom ='Earth';
+        socket.join('Earth');
         console.log(`-*-*-*-\nEVENT: User name ${socket.username} defined for\nSocket Id:\t\t${socket.id}\nDate:\t\t${new Date().toISOString()}\n-------`);
         // dbDao.saveEvent({
         //     eventName:'Username-defined',
@@ -50,44 +47,33 @@ io.on('connection', (socket) => {
         //     socketId : socket.id
         // });
 
-        io.sockets.emit('newMessage', {message : `${socket.username} joined on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
-        io.sockets.emit('newUser', {username : `${socket.username}` ,avatar: userAvatar});
+        io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} joined ${socket.joinedRoom} on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
+        // io.sockets.to('roomPublic').emit('newUser', {username : `${socket.username}` ,avatar: userAvatar});
 
-        socket.emit('newMessage',{message : `Hi ${socket.username} `, username : 'SERVER',avatar:'server'});
-
-        if(msgs.length <10){
-            lastMsg = msgs.length;
-        }else{
-            lastMsg = 10;
-        }
-
-        for (var i =0;i<lastMsg;i++){
-            socket.emit('newMessage',msgs[i]);
-        }
+        socket.emit('newMessage',{message : `Hi ${socket.username},Welcome to planet ${socket.joinedRoom} `, username : 'SERVER',avatar:'server'});
 
     })
 
     //listen on new_message
     socket.on('newMessage', (data) => {
-        msgs.push({message : data.message, username : socket.username,avatar:data.userAvatar});
-
-        dbDao.saveChat({
-            chatUsername:`${socket.username}`,
-            chatMessage:`${data.message}`,
-            chatRoom: 'Public',
-            chatDate: new Date().toISOString(),
-            socketId : socket.id
-        });
+        console.log(data.message);
+        // dbDao.saveChat({
+        //     chatUsername:`${socket.username}`,
+        //     chatMessage:`${data.message}`,
+        //     chatRoom: ${socket.joinedRoom},
+        //     chatDate: new Date().toISOString(),
+        //     socketId : socket.id
+        // });
 
         //broadcast the new message
-        io.sockets.emit('newMessage', {message : data.message, username : socket.username,avatar:data.userAvatar});
-        console.log(msgs);
+        io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : data.message, username : socket.username,avatar:data.userAvatar});
+        // console.log(msgs);
     })
 
     //listen on typing
     socket.on('userTyping', (data) => {
-    	socket.broadcast.emit('userTyping', {username : socket.username});
-    })
+    	socket.to(`${socket.joinedRoom}`).broadcast.emit('userTyping', {username : socket.username});
+    });
 
     socket.on('disconnect', (data) => {
         console.log(`-*-*-*-\nEVENT: ${socket.username} disconnected\nSocket Id:\t\t${socket.id}\nDate:\t\t${new Date().toISOString()}\n-------`);
@@ -98,7 +84,17 @@ io.on('connection', (socket) => {
         //     eventOwner: `${socket.username}`,
         //     socketId : socket.id
         // });
-        io.sockets.emit('newMessage', {message : `${socket.username} left the room on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
+        io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} left the room on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
 
-    })
+    });
+
+    socket.on('changeRoom',(data)=>{
+        console.log(`-*-*-*-\nEVENT: ${socket.username} changed room to ${data.newRoom}\nSocket Id:\t\t${socket.id}\nDate:\t\t${new Date().toISOString()}\n-------`);
+        io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} left the room for ${socket.joinedRoom} on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
+
+        socket.joinedRoom = data.newRoom;
+        socket.join(data.newRoom);
+        socket.emit('newMessage',{message : `Hi ${socket.username},Welcome to ${socket.joinedRoom} planet `, username : 'SERVER',avatar:'server'});
+
+    });
 })

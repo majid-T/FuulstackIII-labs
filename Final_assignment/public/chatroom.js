@@ -58,6 +58,11 @@ $(function(){
         usersPanel.append(`<p class=""><img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/><b>${data.username}</b>`);
         console.log(`${data.username}:${data.avatar}`);
     });
+
+    // change room buttons
+    $(".chatroomLink").click((e)=>{
+        socket.emit('changeRoom',{newRoom : e.target.id});
+    });
 });
 
 
