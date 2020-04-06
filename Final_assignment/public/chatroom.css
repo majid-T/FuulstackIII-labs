@@ -53,8 +53,8 @@ section#chatroom {
 
 section#feedback {
     background-color: seashell;
-    padding:10px;
-    height: 10%;
+    padding:5px;
+    height: 5%;
 }
 
 section#input_zone {
@@ -123,4 +123,11 @@ header #guideNote{
 header:hover #guideNote{
     opacity: 1;
     transition: 250ms ease;
+}
+
+#usersPanel{
+/*    background-image: url(../media/Mars.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    min-height: 200px;*/
 }

@@ -54,15 +54,22 @@ $(function(){
     });
 
     //Listen on new user joining
-    socket.on('newUser', (data) => {
-        usersPanel.append(`<p class=""><img class="message-img" src="media/${data.avatar}.png" alt="Logo by https://logomakr.com/"/><b>${data.username}</b>`);
-        console.log(`${data.username}:${data.avatar}`);
+    socket.on('roomUsers', (data) => {
+        $('.roomMember').remove();
+        console.log(data);
+        for(item of data){
+            usersPanel.append(`<p class="roomMember"><img class="message-img" src="media/${item.avatar}.png" alt="Logo by https://logomakr.com/"/><b>${item.username}</b>`);
+            console.log(`${data.username}:${data.avatar}`);
+        }
+
     });
 
     // change room buttons
     $(".chatroomLink").click((e)=>{
         socket.emit('changeRoom',{newRoom : e.target.id});
+        $('#roomTag').text(e.target.id);
     });
+
 });
 
 
