@@ -41,25 +41,94 @@ const saveChat = (inChat)=>{
     });
 };
 
+const getAllEvents = ()=>{
+  return new Promise((resolve,reject)=>{
+      Event.find((err,documents)=>{
+          if(err){
+            console.log(`ERROR: ${err}`);
+            reject(err);
+          }else{
+            let data = documents.map(x=> {
+              let event = {
+                eventId: x._id,
+                eventName: x.eventName,
+                eventDesc: x.eventDesc,
+                eventDate: x.eventDate,
+                eventOwner: x.eventOwner,
+                socketId : x.socketId
+              };
+            return event;
+          });
+        resolve(JSON.stringify(data));
+      }
+    });
+  });
+};
 
-// //get restaurants listener
-//   socket.on("get-restaurants", () => {
-//     console.log("server - get-restarants called");
-//     Restaurant.where('city').eq('Queens').where('cuisine').eq('Delicatessen').exec((err,results)=>{
-//       if(err){
-//         console.log(`ERROR: ${err}`);
-//       }else{
-//         console.log(`We found: ${results}`);
-//           let data = results.map(x=> {
-//             let restaurant = {
-//               name: x.name,
-//               cuisine: x.cuisine
-//             };
-//             return restaurant;
-//           });
-//           socket.emit('restaurants-data',JSON.stringify(data));
-//       }
-//     });
+const getAllChats = ()=>{
+  return new Promise((resolve,reject)=>{
+      ChatHistory.find((err,documents)=>{
+          if(err){
+            console.log(`ERROR: ${err}`);
+            reject(err);
+          }else{
+            let data = documents.map(x=> {
+              let chat = {
+                chatId: x._id,
+                chatUsername: x.chatUsername,
+                chatMessage: x.chatMessage,
+                chatRoom: x.chatRoom,
+                chatDate: x.chatDate,
+                socketId : x.socketId
+              };
+            return chat;
+          });
+        resolve(JSON.stringify(data));
+      }
+    });
+  });
+};
+
+const getChatsForRoom = (room)=>{
+  return new Promise((resolve,reject)=>{
+      ChatHistory.where('chatRoom').eq(`${room}`).exec((err,documents)=>{
+          if(err){
+            console.log(`ERROR: ${err}`);
+            reject(err);
+          }else{
+            let data = documents.map(x=> {
+              let chat = {
+                chatId: x._id,
+                chatUsername: x.chatUsername,
+                chatMessage: x.chatMessage,
+                chatRoom: x.chatRoom,
+                chatDate: x.chatDate,
+                socketId : x.socketId
+              };
+            return chat;
+          });
+        resolve(JSON.stringify(data));
+      }
+    });
+  });
+};
+  // socket.on("get-restaurants", () => {
+  //   console.log("server - get-restarants called");
+  //   Restaurant.where('city').eq('Queens').where('cuisine').eq('Delicatessen').exec((err,results)=>{
+  //     if(err){
+  //       console.log(`ERROR: ${err}`);
+  //     }else{
+  //       console.log(`We found: ${results}`);
+  //         let data = results.map(x=> {
+  //           let restaurant = {
+  //             name: x.name,
+  //             cuisine: x.cuisine
+  //           };
+  //           return restaurant;
+  //         });
+  //         socket.emit('restaurants-data',);
+  //     }
+  //   });
     // Restaurant.find((err,documents)=>{
     //   if(err){
     //     console.log(`Error on getting data from db ${err}`);
@@ -120,3 +189,6 @@ const saveChat = (inChat)=>{
 
 module.exports.saveEvent = saveEvent;
 module.exports.saveChat = saveChat;
+module.exports.getAllEvents = getAllEvents;
+module.exports.getAllChats = getAllChats;
+module.exports.getChatsForRoom = getChatsForRoom;

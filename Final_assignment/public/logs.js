@@ -1,41 +1,63 @@
-
 $(function(){
-	let option = {room: 'General'};
-	var socket = io.connect('http://localhost:3000?room=majidRoom');
+	const logsContainer = $('#logsContainer');
+	const tableContent = $('#tableContent');
+	let currentView = '';
+    let socket = io.connect('http://localhost:3000');
 
-	var message = $("#message")
-	var username = $("#username")
-	var send_message = $("#send_message")
-	var send_username = $("#send_username")
-	var chatroom = $("#chatroom")
-	var feedback = $("#feedback")
+    //loading all events by default
+	socket.emit('getAllEvents');
+	$('#getAllEvents').hide();
+	currentView = 'getAllEvents';
 
-	//Emit message
-	send_message.click( () => {
-		socket.emit('newMessage', {message : message.val()})
+
+    // get specific room
+    $(".logLink").click((e)=>{
+    	tableContent.children('tr').remove();
+	   	socket.emit('getChatsForRoom',{room:e.target.id});
+    });
+
+    //get all messages
+    $('#getAllChats').click(()=>{
+    	socket.emit('getAllChats');
+    	tableContent.empty();
+    });
+
+    //get all events
+    $('#getAllEvents').click(()=>{
+    	socket.emit('getAllEvents');
+    	tableContent.empty();
+    });
+
+    //listeners for events
+    //for all chats
+	socket.on('allChats',(data)=>{
+		let jsonData = JSON.parse(data);
+		let counter = 1;
+		for(item of jsonData){
+			let st1 = `<tr><th scope="row">${counter++}</th><td>${item.chatUsername}</td>
+			<td>${item.chatMessage}</td><td>${item.chatRoom}</td><td>${item.chatDate}</td>
+			<td>${item.chatId}</td><td>${item.socketId}</td></tr>`;
+			tableContent.append(st1);
+		}
+
+		$(`#${currentView}`).show();
+		$('#getAllChats').hide();
+		currentView = 'getAllChats';
 	});
 
-	//Listen on new_message
-	socket.on("newMessage", (data) => {
-		feedback.html('');
-		message.val('');
-		chatroom.append("<p class='message'>" + data.username + ": " + data.message + "</p>")
-	})
+	//for all events
+	socket.on('allEvents',(data)=>{
+		let jsonData = JSON.parse(data);
+		let counter = 1;
+		for(item of jsonData){
+			let st1 = `<tr><th scope="row">${counter++}</th><td>${item.eventName}</td>
+			<td>${item.eventOwner}</td><td>${item.eventDesc}</td><td>${item.eventDate}</td>
+			<td>${item.eventId}</td><td>${item.socketId}</td></tr>`;
+			tableContent.append(st1);
+		}
 
-	//Emit a username
-	send_username.click(function(){
-		socket.emit('changeUsername', {username : username.val()})
-	})
-
-	//Emit typing
-	message.bind("keypress", () => {
-		socket.emit('userTyping')
-	})
-
-	//Listen on typing
-	socket.on('userTyping', (data) => {
-		feedback.html("<p><i>" + data.username + " is typing a message..." + "</i></p>")
-	})
+		$(`#${currentView}`).show();
+		$('#getAllEvents').hide();
+		currentView = 'getAllEvents';
+	});
 });
-
-

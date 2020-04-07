@@ -58,9 +58,9 @@ io.on('connection', (socket) => {
         console.log(`-*-*-*-\nEVENT: User name ${socket.username} defined for\nSocket Id:\t\t${socket.id}\nDate:\t\t${new Date().toISOString()}\n-------`);
         dbDao.saveEvent({
             eventName:'Username-defined',
-            eventDesc:`${socket.id} defined username ${nickname} for himself`,
+            eventDesc:`${socket.id} defined username ${socket.username} for himself`,
             eventDate:new Date().toISOString(),
-            eventOwner: `${nickname}`,
+            eventOwner: `${socket.username}`,
             socketId : socket.id
         });
 
@@ -105,9 +105,10 @@ io.on('connection', (socket) => {
         });
         io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} left the room on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
         //Remove people from list and emit to all here....
-        Rooms[socket.joinedRoom] = Rooms[socket.joinedRoom].filter(x => x.username!==socket.username);
-        io.sockets.to(`${socket.joinedRoom}`).emit('roomUsers',Rooms[socket.joinedRoom]);
-
+        if(socket.joinedRoom){
+            Rooms[socket.joinedRoom] = Rooms[socket.joinedRoom].filter(x => x.username!==socket.username);
+            io.sockets.to(`${socket.joinedRoom}`).emit('roomUsers',Rooms[socket.joinedRoom]);
+        }
     });
 
     socket.on('changeRoom',(data)=>{
@@ -136,4 +137,42 @@ io.on('connection', (socket) => {
             socketId : socket.id
         });
     });
+
+
+    //---------------------------------
+    // ---- logs events----------------
+    // --------------------------------
+    socket.on('getAllEvents',()=>{
+        console.log('All events triggered');
+        dbDao.getAllEvents()
+            .then((data)=>{
+                socket.emit('allEvents',data);
+            })
+            .catch((data)=>{
+                console.log(`ERROR\n: ${data}`);
+            });
+    });
+
+    socket.on('getAllChats',()=>{
+        console.log('All chats triggered');
+        dbDao.getAllChats()
+            .then((data)=>{
+                socket.emit('allChats',data);
+            })
+            .catch((data)=>{
+                console.log(`ERROR\n: ${data}`);
+            });
+    });
+
+    socket.on('getChatsForRoom',(data)=>{
+        console.log(`Chat history requested for ${data.room}`);
+        dbDao.getChatsForRoom(data.room)
+            .then((data)=>{
+                socket.emit('allChats',data);
+            })
+            .catch((data)=>{
+                console.log(`ERROR\n: ${data}`);
+            });
+    });
+
 })
