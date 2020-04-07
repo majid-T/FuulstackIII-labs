@@ -5,6 +5,9 @@ $(function(){
     let avatar = searchParams.get('avatar');
     let userAvatarImg = $('#userAvatar');
 
+    //enabling tool tip bootstrap
+     $('[data-toggle="tooltip"]').tooltip();
+
     userAvatarImg.attr("src", `media/${avatar}.png`);
     userAvatarImg.attr("alt", 'Logo by https://logomakr.com/s');
 
@@ -24,6 +27,9 @@ $(function(){
     let chatroom = $("#chatroom");
     let feedback = $("#feedback");
     let usersPanel = $("#usersPanel");
+    let currentRoom = 'Earth';
+
+    $(`#${currentRoom}`).hide();
 
     //Emit message
     send_message.click( () => {
@@ -66,6 +72,10 @@ $(function(){
 
     // change room buttons
     $(".chatroomLink").click((e)=>{
+        currentRoom = e.target.id;
+         $(".chatroomLink").show();
+         $(`#${currentRoom}`).hide();
+
         socket.emit('changeRoom',{newRoom : e.target.id});
         $('#roomTag').text(e.target.id);
     });

@@ -2,19 +2,11 @@ const express = require('express');
 const app = express();
 const dbDao = require('./dao');
 
-let Rooms = {
-    Mars : [],
-    Jupiter : [],
-    Saturn : [],
-    Sun : [],
-    Earth : []
-};
-
+let Rooms = { Mars : [], Jupiter : [], Saturn : [], Sun : [], Earth : [] };
 
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-
 
 //routing parts
 app.get('/', (req, res) => {
@@ -28,6 +20,7 @@ app.get('/chatroom', (req, res) => {
 app.get('/logs', (req, res) => {
     res.render('logs');
 });
+ //-----------------
 
 server = app.listen(3000);
 
@@ -51,9 +44,7 @@ io.on('connection', (socket) => {
         socket.joinedRoom ='Earth';
         socket.join('Earth');
 
-        //show users -----
         Rooms['Earth'].push({username:socket.username,avatar:socket.avatar});
-        //end of show users
 
         console.log(`-*-*-*-\nEVENT: User name ${socket.username} defined for\nSocket Id:\t\t${socket.id}\nDate:\t\t${new Date().toISOString()}\n-------`);
         dbDao.saveEvent({
@@ -67,7 +58,6 @@ io.on('connection', (socket) => {
         io.sockets.to(`${socket.joinedRoom}`).emit('roomUsers',Rooms[socket.joinedRoom]);
 
         io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} joined ${socket.joinedRoom} on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
-        // io.sockets.to('roomPublic').emit('newUser', {username : `${socket.username}` ,avatar: userAvatar});
 
         socket.emit('newMessage',{message : `Hi ${socket.username},Welcome to planet ${socket.joinedRoom} `, username : 'SERVER',avatar:'server'});
 
@@ -86,7 +76,6 @@ io.on('connection', (socket) => {
 
         //broadcast the new message
         io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : data.message, username : socket.username,avatar:data.userAvatar});
-        // console.log(msgs);
     })
 
     //listen on typing
@@ -104,7 +93,6 @@ io.on('connection', (socket) => {
             socketId : socket.id
         });
         io.sockets.to(`${socket.joinedRoom}`).emit('newMessage', {message : `${socket.username} left the room on ${new Date().toISOString()}`, username : 'SERVER',avatar:'server'});
-        //Remove people from list and emit to all here....
         if(socket.joinedRoom){
             Rooms[socket.joinedRoom] = Rooms[socket.joinedRoom].filter(x => x.username!==socket.username);
             io.sockets.to(`${socket.joinedRoom}`).emit('roomUsers',Rooms[socket.joinedRoom]);
@@ -123,7 +111,6 @@ io.on('connection', (socket) => {
         //show users -----
         Rooms[prevRoom] = Rooms[prevRoom].filter(x => x.username!==socket.username);
         Rooms[data.newRoom].push({username:socket.username,avatar:socket.avatar});
-        // console.log(Rooms);
         io.sockets.to(`${prevRoom}`).emit('roomUsers',Rooms[prevRoom]);
         io.sockets.to(`${socket.joinedRoom}`).emit('roomUsers',Rooms[socket.joinedRoom]);
 

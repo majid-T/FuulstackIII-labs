@@ -12,11 +12,6 @@ body {
     background-color: #509eff;
 }
 
-/*header{
-    padding: 10px;
-    height: 10%;
-}*/
-
 h1, h2, h3, h4, h5, h6 {
     color: #444444;
 }
@@ -123,11 +118,4 @@ header #guideNote{
 header:hover #guideNote{
     opacity: 1;
     transition: 250ms ease;
-}
-
-#usersPanel{
-/*    background-image: url(../media/Mars.png);
-    background-size: contain;
-    background-repeat: no-repeat;
-    min-height: 200px;*/
 }

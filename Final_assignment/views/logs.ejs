@@ -15,22 +15,19 @@
   <body>
     <header class="site-header">
       <h3>Here you can view our logs</h3>
-      <span class="logLinkEvents btn btn-warning" id="getAllEvents">All events</span>
-      <span class="logLinkChats btn btn-warning" id="getAllChats">All chats</span>
-      <span class="logLink btn btn-warning" id="Mars">Mars</span>
-      <span class="logLink btn btn-warning" id="Jupiter">Jupiter</span>
-      <span class="logLink btn btn-warning" id="Saturn">Saturn</span>
-      <span class="logLink btn btn-warning" id="Sun">Sun</span>
-      <span class="logLink btn btn-warning" id="Earth">Earth</span>
+      <span class="logLinkEvents btn btn-warning" id="getAllEvents" data-toggle="tooltip" title="View all events">All events</span>
+      <span class="logLinkChats btn btn-warning" id="getAllChats" data-toggle="tooltip" title="Our Univers Chats!">All chats</span>
+      <span class="logLink btn btn-warning" id="Mars" data-toggle="tooltip" title="Planet Mars Chats!">Mars</span>
+      <span class="logLink btn btn-warning" id="Jupiter" data-toggle="tooltip" title="Planet Jupiter Chats!">Jupiter</span>
+      <span class="logLink btn btn-warning" id="Saturn" data-toggle="tooltip" title="Planet Saturn Chats!">Saturn</span>
+      <span class="logLink btn btn-warning" id="Sun" data-toggle="tooltip" title="Planet Sun Chats!">Sun</span>
+      <span class="logLink btn btn-warning" id="Earth" data-toggle="tooltip" title="Planet Earth Chats!">Earth</span>
       <p id="guideNote">Decide which logs you need to see &rarr;</p>
     </header>
     <main role="main" class="container">
         <div id="logsContainer" class="logs table-responsive">
             <table class="table table-striped table-hover table-dark">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th><th scope="col">EVENT</th><th scope="col">OWNER</th><th scope="col">DESC</th><th scope="col">DATE</th><th scope="col">DB ID</th><th scope="col">SOCKET ID</th>
-                    </tr>
+                <thead id="tableHeader">
                 </thead>
                 <tbody id="tableContent">
                 </tbody>
